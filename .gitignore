@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Bun
+bun.lock
+
+# Test
+coverage/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# TypeScript
+*.tsbuildinfo
+
+# Claude Code
+.claude/settings.local.json
+
