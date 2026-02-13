@@ -215,6 +215,10 @@ export const productsService = {
             throw new NotFoundError(`Product with id '${productId}' not found`);
         }
 
+        // Delete configHistory first (references configs.id), then configs
+        await db.delete(configHistory).where(eq(configHistory.productId, productId));
+        await db.delete(configs).where(eq(configs.productId, productId));
+
         await db
             .update(products)
             .set({

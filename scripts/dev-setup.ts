@@ -93,6 +93,9 @@ async function checkDocker(): Promise<void> {
 
 async function startCompose(): Promise<void> {
   console.log('');
+  info('Stopping existing containers and removing volumes for a clean database...');
+  await run(['docker-compose', 'down', '-v'], ROOT_DIR);
+
   info('Starting Docker Compose services...');
 
   const ok = await runPassthrough(['docker-compose', 'up', '-d'], ROOT_DIR);
