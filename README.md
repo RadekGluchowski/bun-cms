@@ -9,8 +9,8 @@ A modern, production-ready CMS template for managing product configurations. Bui
 - Manage **products** with associated **JSON configurations**
 - Support **draft/publish workflow** with automatic versioning
 - Track **full history** of all changes with **rollback** capability
-- **Export/Import** entire products with configs as JSON
-- Provide **public API** for consuming published configurations
+- **Export** entire products with configs as JSON
+- Provide **public API** for consuming draft/published configurations
 
 **Use cases:**
 - Product configuration management (e-commerce, SaaS, any domain)
@@ -29,7 +29,7 @@ A modern, production-ready CMS template for managing product configurations. Bui
 | 🔍 **Global Search** | Search across products and configurations |
 | 🔐 **JWT Authentication** | Secure admin authentication |
 | 🌐 **Public API** | Unauthenticated endpoints for consumers |
-| 📤 **Export/Import** | Full product export as JSON with import capability |
+| 📤 **Export** | Full product export as JSON |
 | 📱 **Responsive UI** | Modern React dashboard with Shadcn/ui |
 
 ## 🛠️ Tech Stack
@@ -45,8 +45,8 @@ A modern, production-ready CMS template for managing product configurations. Bui
 ### Frontend
 | Technology | Purpose |
 |------------|---------|
-| [React 18](https://react.dev) | UI library |
-| [Vite](https://vitejs.dev) | Build tool & dev server |
+| [React 19](https://react.dev) | UI library |
+| [Vite 7](https://vitejs.dev) | Build tool & dev server |
 | [Tailwind CSS](https://tailwindcss.com) | Styling |
 | [Shadcn/ui](https://ui.shadcn.com) | UI component library |
 | [TanStack Query](https://tanstack.com/query) | Server state management |
@@ -97,12 +97,12 @@ docker-compose --version
 ### Create from template
 
 ```bash
-bun create github-user/bun-cms my-app
+bun create RadekGluchowski/bun-cms my-app
 cd my-app
 bun run setup
 ```
 
-> Replace `github-user/bun-cms` with the actual GitHub `owner/repo`. This clones the repo, removes `.git`, installs dependencies, then `setup` handles Docker, `.env`, migrations, and seeding.
+> This clones the repo, then `setup` handles Docker, `.env`, migrations, and seeding.
 
 ### Or clone manually
 
@@ -206,31 +206,15 @@ bun run dev
 
 ### Config Types
 
-Default config types (in `packages/shared/src/index.ts`):
+Config types are **dynamic strings** (any 1-100 character string) — there is no fixed enum. Each product can have any number of config types. The seed data creates a sample product with these types: `general`, `settings`, `metadata`, `translations`.
 
+Each config type contains a **ConfigDocument**:
 ```typescript
-export const CONFIG_TYPES = ['general', 'settings', 'metadata', 'translations'] as const;
+{
+  meta: { title: string, description?: string, category?: string, icon?: string },
+  body: JsonValue  // any valid JSON
+}
 ```
-
-| Type | Purpose |
-|------|---------|
-| `general` | Basic product information |
-| `settings` | Feature flags, options |
-| `metadata` | SEO, Open Graph data |
-| `translations` | Multi-language content |
-
-### Customizing Config Types
-
-1. Edit `packages/shared/src/index.ts` - update `CONFIG_TYPES`
-2. Edit `apps/backend/src/db/schema.ts` - update `configTypeEnum`
-3. Update Elysia schemas in configs and products modules
-4. Edit `apps/frontend/src/api/configs.api.ts` - update `ConfigType`
-5. Update UI labels in `ConfigEditorPage.tsx`, `HistoryPage.tsx`
-6. Generate and run new migration:
-   ```bash
-   bun run db:generate
-   bun run db:migrate
-   ```
 
 ## 📁 Project Structure
 
@@ -292,17 +276,25 @@ bun-cms-template/
 | GET | `/api/configs/:productId/:configType` | Get config |
 | PUT | `/api/configs/:productId/:configType` | Update draft |
 | POST | `/api/configs/:productId/:configType/publish` | Publish draft |
-| POST | `/api/configs/:productId/:configType/rollback/:version` | Rollback to version |
+| POST | `/api/configs/:productId/:configType/rollback/:historyId` | Rollback to version |
 
 ### Public API (no auth)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/public/configs/:code/:configType` | Get published config by product code |
+| GET | `/api/public/products/:code/config` | Get published config bundle for a product |
+| GET | `/api/public/products/:code/draft` | Get draft bundle (drafts override published) |
+| GET | `/api/public/draft/:configId` | Get single draft preview |
 
 ### Search (requires auth)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/search?q=query` | Global search |
+
+### Health
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check (database connectivity) |
+| GET | `/ready` | Readiness probe |
 
 ## 🔐 Environment Variables
 
