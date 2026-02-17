@@ -217,7 +217,7 @@ test.describe('Editor Role Restrictions', () => {
         { code: `EDITOR-API-${Date.now()}`, name: 'Editor Created Product' },
         editorToken
       );
-      expect(result.status).toBe(200);
+      expect(result.status).toBe(201);
 
       // Clean up
       const body = result.body as { id: string };

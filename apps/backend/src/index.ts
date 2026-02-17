@@ -25,20 +25,14 @@ const SWAGGER_TAGS = [
     { name: 'Admins', description: 'Admin user management endpoints' },
 ] as const;
 
-new Elysia()
-    .use(
-        swagger({
-            path: '/swagger',
-            documentation: {
-                info: {
-                    title: 'CMS API',
-                    version: '1.0.0',
-                    description: 'Content Management System API for managing product configurations',
-                },
-                tags: [...SWAGGER_TAGS],
-            },
-        })
-    )
+const app = new Elysia()
+    .onBeforeHandle(({ set }) => {
+        set.headers['X-Content-Type-Options'] = 'nosniff';
+        set.headers['X-Frame-Options'] = 'DENY';
+        set.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
+        set.headers['X-XSS-Protection'] = '0';
+        set.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()';
+    })
     .use(
         cors({
             origin: env.FRONTEND_URL,
@@ -90,17 +84,34 @@ new Elysia()
         () => {
             return { ready: true };
         }
-    )
-    .listen(env.PORT, () => {
-        logger.info(
-            {
-                port: env.PORT,
-                environment: env.NODE_ENV,
-                swagger: `http://localhost:${env.PORT}/swagger`,
+    );
+
+if (isDevelopment()) {
+    app.use(
+        swagger({
+            path: '/swagger',
+            documentation: {
+                info: {
+                    title: 'CMS API',
+                    version: '1.0.0',
+                    description: 'Content Management System API for managing product configurations',
+                },
+                tags: [...SWAGGER_TAGS],
             },
-            `🚀 CMS Backend started${isDevelopment() ? ' in development mode' : ''}`
-        );
-    });
+        })
+    );
+}
+
+app.listen(env.PORT, () => {
+    logger.info(
+        {
+            port: env.PORT,
+            environment: env.NODE_ENV,
+            ...(isDevelopment() ? { swagger: `http://localhost:${env.PORT}/swagger` } : {}),
+        },
+        `🚀 CMS Backend started${isDevelopment() ? ' in development mode' : ''}`
+    );
+});
 
 async function gracefulShutdown(signal: string): Promise<void> {
     logger.info({ signal }, 'Received shutdown signal, starting graceful shutdown...');

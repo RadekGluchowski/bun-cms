@@ -53,6 +53,12 @@ export class ConflictError extends AppError {
     }
 }
 
+export class TooManyRequestsError extends AppError {
+    constructor(message: string = 'Too many requests') {
+        super(message, 429, 'TOO_MANY_REQUESTS');
+    }
+}
+
 interface ErrorResponse {
     error: string;
     message: string;
@@ -85,7 +91,7 @@ function formatErrorResponse(
 
 export const errorHandlerPlugin = new Elysia({ name: 'error-handler' }).onError(
     { as: 'global' },
-    ({ error, set }) => {
+    ({ error, code: elysiaCode, set }) => {
         const isAppError = error instanceof AppError ||
             (error instanceof Error &&
                 'statusCode' in error &&
@@ -107,6 +113,21 @@ export const errorHandlerPlugin = new Elysia({ name: 'error-handler' }).onError(
 
             set.status = appError.statusCode;
             return formatErrorResponse(appError, appError.statusCode, appError.code);
+        }
+
+        // Elysia TypeBox validation errors (elysiaCode === 'VALIDATION')
+        if (elysiaCode === 'VALIDATION') {
+            const message = error instanceof Error ? error.message : 'Validation failed';
+            logger.warn(
+                {
+                    error: 'ValidationError',
+                    message,
+                },
+                'Validation error'
+            );
+
+            set.status = 400;
+            return formatErrorResponse(error, 400, 'VALIDATION_ERROR');
         }
 
         const isErrorLike = error instanceof Error ||

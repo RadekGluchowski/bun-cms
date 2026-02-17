@@ -10,7 +10,8 @@ export const createProductBodySchema = t.Object({
     code: t.String({
         minLength: 1,
         maxLength: 50,
-        error: 'Code is required and must be max 50 characters',
+        pattern: '^[A-Za-z0-9_-]+$',
+        error: 'Code must be 1-50 alphanumeric characters (letters, digits, hyphens, underscores)',
     }),
     name: t.String({
         minLength: 1,
