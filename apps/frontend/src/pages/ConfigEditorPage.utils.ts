@@ -1,16 +1,9 @@
 import type { ConfigDocument, JsonValue } from '@app/shared';
 
-export function formatConfigTypeName(configType: string): string {
-    return configType
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase())
-        .trim();
-}
-
 export function newEmptyDocument(configType: string): ConfigDocument {
     return {
         meta: {
-            title: formatConfigTypeName(configType),
+            title: configType,
             description: '',
             category: '',
             icon: '',
@@ -40,7 +33,7 @@ export function ensureValidDocument(data: unknown, configType: string): ConfigDo
     if (typeof meta.title !== 'string' || meta.title.length === 0) {
         return {
             meta: {
-                title: formatConfigTypeName(configType),
+                title: configType,
                 description: typeof meta.description === 'string' ? meta.description : '',
                 category: typeof meta.category === 'string' ? meta.category : '',
                 icon: typeof meta.icon === 'string' ? meta.icon : '',

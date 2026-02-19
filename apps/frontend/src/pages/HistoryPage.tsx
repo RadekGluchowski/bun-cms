@@ -32,14 +32,6 @@ import { useParams } from 'react-router-dom';
 
 type FilterValue = 'all' | ConfigType;
 
-// Formatuje configType do czytelnej nazwy (np. "coveragesMeta" -> "Coverages Meta")
-function formatConfigTypeName(configType: string): string {
-    return configType
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase())
-        .trim();
-}
-
 interface HistoryEntryItemProps {
     entry: HistoryEntry;
     onPreview: (entry: HistoryEntry) => void;
@@ -65,7 +57,7 @@ function HistoryEntryItem({ entry, onPreview, onRollback, isCurrentVersion, isAd
             </div>
 
             <Badge data-testid={`history-entry-type-${entry.id}`} variant="outline" className="w-24 justify-center">
-                {formatConfigTypeName(entry.configType)}
+                {entry.configType}
             </Badge>
 
             <div data-testid={`history-entry-version-${entry.id}`} className="w-12 text-sm font-medium">
@@ -155,7 +147,7 @@ function FilterDropdown({
         for (const configType of availableConfigTypes) {
             options.push({
                 value: configType,
-                label: formatConfigTypeName(configType),
+                label: configType,
             });
         }
         return options;

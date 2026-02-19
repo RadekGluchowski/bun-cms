@@ -34,7 +34,7 @@ import { ExternalLink, Eye, Loader2, Save, Send } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { ensureValidDocument, formatConfigTypeName, newEmptyDocument } from './ConfigEditorPage.utils';
+import { ensureValidDocument, newEmptyDocument } from './ConfigEditorPage.utils';
 
 export function ConfigEditorPage() {
     const { id: productId, type: configTypeParam } = useParams<{ id: string; type: string }>();
@@ -249,7 +249,7 @@ export function ConfigEditorPage() {
                     { label: 'Produkty', href: '/products' },
                     { label: product.name, href: `/products/${productId}` },
                     { label: 'Konfiguracje', href: `/products/${productId}` },
-                    { label: formatConfigTypeName(configType) },
+                    { label: configType },
                 ]}
             />
 
@@ -267,7 +267,7 @@ export function ConfigEditorPage() {
 
             <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-semibold" data-testid="config-editor-title">{formatConfigTypeName(configType)}</h1>
+                    <h1 className="text-xl font-semibold" data-testid="config-editor-title">{configType}</h1>
                     <Badge variant={hasDraft ? 'secondary' : 'outline'} data-testid="config-editor-draft-badge">
                         {hasDraft ? 'Draft' : 'Brak draftu'}
                     </Badge>

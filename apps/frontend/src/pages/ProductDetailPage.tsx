@@ -34,13 +34,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 // Helper to format config type name for display
-function formatConfigTypeName(configType: string): string {
-    return configType
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase())
-        .trim();
-}
-
 function ProductInfoCard({ product }: { product: Product }) {
     return (
         <Card data-testid="product-detail-info-card">
@@ -117,7 +110,7 @@ function ConfigCard({
     productId: string;
 }) {
     // Użyj meta.title jeśli dostępne, w przeciwnym razie sformatuj configType
-    const displayTitle = config.meta?.title ?? formatConfigTypeName(config.configType);
+    const displayTitle = config.meta?.title ?? config.configType;
     const description = config.meta?.description;
     const category = config.meta?.category;
 
@@ -190,7 +183,7 @@ function AddConfigCard({ onClick }: { onClick: () => void }) {
 function newEmptyDocument(configType: string): ConfigDocument {
     return {
         meta: {
-            title: formatConfigTypeName(configType),
+            title: configType,
             description: '',
             category: '',
             icon: '',
